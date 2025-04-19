@@ -10,64 +10,21 @@ There are several ways of editing your application.
 
 **Use Lovable**
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/bc1591bb-7b99-46cd-b661-5410c6078375) and start prompting.
+Simply visit the [Lovable Project](https://lovable.dev/projects/bc1591bb-7b99-46cd-b661-5410c6078375).
 
-Changes made via Lovable will be committed automatically to this repo.
+## Making the application online
 
-**Use your preferred IDE**
+To make the application accessible online, you need to deploy it to a hosting service. Here are a few options:
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+*   **Firebase Hosting**: A fast, secure, and reliable hosting service from Google.
+*   **Netlify**: A popular platform for deploying web applications.
+*   **Vercel**: Another great option for deploying web applications.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Each of these services provides its own documentation and tutorials on how to deploy your application. Choose the one that best suits your needs and follow their instructions.
 
-Follow these steps:
+## Next steps
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+*   Explore the [Firebase Studio documentation](/docs/studio).
+*   [Get started with Firebase Studio](https://studio.firebase.google.com/).
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/bc1591bb-7b99-46cd-b661-5410c6078375) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes it is!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Send feedback

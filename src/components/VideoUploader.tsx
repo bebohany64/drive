@@ -150,7 +150,7 @@ export function VideoUploader({ onVideoURLGenerated }: VideoUploaderProps) {
             ref={fileInputRef}
             type="file" 
             className="hidden" 
-            accept="video/*"
+            accept=".mp4, .mov, .avi, .wmv"
             onChange={handleFileChange}
           />
           

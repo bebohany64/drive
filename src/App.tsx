@@ -1,190 +1,171 @@
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
+import { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { DataProvider } from './context/DataContext';
+import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
-import { DataProvider } from "./context/DataContext";
-import PhysicsBackground from "./components/PhysicsBackground";
-import Index from "./pages/Index";
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import StudentsManagement from "./pages/StudentsManagement";
-import ParentsManagement from "./pages/ParentsManagement";
-import ScanCode from "./pages/ScanCode";
-import Videos from "./pages/Videos";
-import Books from "./pages/Books";
-import StudentCode from "./pages/StudentCode";
-import AttendanceRecord from "./pages/AttendanceRecord";
-import Grades from "./pages/Grades";
-import Unauthorized from "./pages/Unauthorized";
-import NotFound from "./pages/NotFound";
-import RequireAuth from "./components/RequireAuth";
-import AttendanceRecordList from "./pages/AttendanceRecordList";
-import AttendanceListByGrade from "./pages/AttendanceListByGrade";
-import GradesManagement from "./pages/GradesManagement";
-import GradesByGrade from "./pages/GradesByGrade";
-import StudentGrades from "./pages/StudentGrades";
-import { useEffect } from "react";
-import "./App.css";
 
-// استيراد خط Tajawal للنص العربي
-import "@fontsource/tajawal/400.css"; 
-import "@fontsource/tajawal/500.css";
-import "@fontsource/tajawal/700.css";
+// استيراد الصفحات
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import Index from './pages/Index';
+import StudentsManagement from './pages/StudentsManagement';
+import ParentsManagement from './pages/ParentsManagement';
+import GradesManagement from './pages/GradesManagement';
+import AttendanceRecordList from './pages/AttendanceRecordList';
+import AttendanceRecord from './pages/AttendanceRecord';
+import ScanCode from './pages/ScanCode';
+import StudentCode from './pages/StudentCode';
+import Videos from './pages/Videos';
+import Books from './pages/Books';
+import Grades from './pages/Grades';
+import GradesByGrade from './pages/GradesByGrade';
+import StudentGrades from './pages/StudentGrades';
+import AttendanceListByGrade from './pages/AttendanceListByGrade';
+import NotFound from './pages/NotFound';
+import Unauthorized from './pages/Unauthorized';
+import RequireAuth from './components/RequireAuth';
 
-// إنشاء عنصر أنماط للخط
-const tajawalFontStyles = document.createElement("style");
-tajawalFontStyles.textContent = `
-  @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
-  
-  * {
-    font-family: 'Tajawal', sans-serif;
-  }
-  
-  .font-tajawal {
-    font-family: 'Tajawal', sans-serif;
-  }
-  
-  /* تجاوز تصميم الإخطارات - جعلها غير شفافة */
-  .toast-root {
-    background-color: #171E31 !important;
-    border: 1px solid #D4AF37 !important;
-    color: white !important;
-    opacity: 1 !important;
-  }
-  
-  /* إشعارات غير شفافة */
-  [data-sonner-toast] {
-    opacity: 1 !important;
-    background-color: #171E31 !important;
-    border: 1px solid #D4AF37 !important;
-  }
-  
-  /* أزرار مستديرة */
-  .goldBtn {
-    border-radius: 24px !important;
-  }
-  
-  /* تحسين جودة الصورة */
-  img {
-    image-rendering: -webkit-optimize-contrast;
-    image-rendering: crisp-edges;
-  }
-  
-  /* مشغل فيديو أفضل */
-  video {
-    object-fit: contain;
-  }
-`;
-document.head.appendChild(tajawalFontStyles);
+// الأنماط المخصصة
+const applyCustomStyles = () => {
+  const styleId = 'custom-app-styles';
+  if (document.getElementById(styleId)) return; // منع إضافة الأنماط عدة مرات
 
-const queryClient = new QueryClient();
-
-const App = () => {
-  // طلب الأذونات عند تحميل التطبيق
-  useEffect(() => {
-    const requestPermissions = async () => {
-      // طلب إذن الإشعارات
-      if ('Notification' in window && Notification.permission !== 'granted') {
-        try {
-          const permission = await Notification.requestPermission();
-          console.log("Notification permission:", permission);
-        } catch (error) {
-          console.error("خطأ في طلب إذن الإشعارات:", error);
-        }
-      }
-      
-      // محاولة اكتشاف اتجاه الجهاز للحصول على الأذونات
-      if (typeof DeviceOrientationEvent !== 'undefined' && 
-          typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
-        try {
-          await (DeviceOrientationEvent as any).requestPermission();
-        } catch (error) {
-          console.log("خطأ في إذن توجيه الجهاز:", error);
-        }
-      }
-      
-      // طلب إذن الكاميرا إذا كان متاحًا
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        try {
-          // طلب أذونات الصوت/الفيديو
-          await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-            .then(stream => {
-              // إيقاف جميع المسارات لتحرير الكاميرا/الميكروفون
-              stream.getTracks().forEach(track => track.stop());
-            });
-        } catch (error) {
-          console.log("خطأ في أذونات الوسائط:", error);
-        }
-      }
-    };
+  const tajawalFontStyles = document.createElement("style");
+  tajawalFontStyles.id = styleId;
+  tajawalFontStyles.textContent = `
+    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
     
-    // استدعاء وظيفة طلب الأذونات
-    requestPermissions();
+    * {
+      font-family: 'Tajawal', sans-serif;
+    }
+    
+    .font-tajawal {
+      font-family: 'Tajawal', sans-serif;
+    }
+    
+    /* تجاوز تصميم الإخطارات - جعلها غير شفافة */
+    .toast-root {
+      background-color: #171E31 !important; /* لون داكن */
+      border: 1px solid #D4AF37 !important; /* حد ذهبي */
+      color: white !important;
+      opacity: 1 !important;
+    }
+    
+    /* إشعارات Sonner غير شفافة */
+    [data-sonner-toast] {
+      opacity: 1 !important;
+      background-color: #171E31 !important; /* لون داكن */
+      border: 1px solid #D4AF37 !important; /* حد ذهبي */
+      color: white !important;
+    }
+    
+    /* أزرار مستديرة */
+    .goldBtn {
+      background-color: #D4AF37; /* لون ذهبي */
+      color: #091138; /* لون كحلي */
+      padding: 0.5rem 1.5rem;
+      border-radius: 9999px !important; /* جعلها مستديرة تمامًا */
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+    .goldBtn:hover {
+      background-color: #b89b30; /* درجة أغمق عند المرور */
+    }
+    .goldBtn:disabled {
+      background-color: #a08c3a;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+    
+    /* حقول الإدخال */
+    .inputField {
+       background-color: #1c233e; /* كحلي أغمق قليلاً */
+       border: 1px solid #3a4a8c; /* حد كحلي */
+       color: white;
+       padding: 0.75rem 1rem;
+       border-radius: 8px;
+       width: 100%;
+    }
+    .inputField:focus {
+      outline: none;
+      border-color: #D4AF37; /* حد ذهبي عند التركيز */
+      box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.3); /* توهج ذهبي خفيف */
+    }
+
+    /* تحسين جودة الصورة */
+    img {
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
+    }
+    
+    /* مشغل فيديو أفضل */
+    video {
+      object-fit: contain;
+    }
+  `;
+  document.head.appendChild(tajawalFontStyles);
+};
+
+function AppContent() {
+  // تطبيق الأنماط عند تحميل المكون
+  useEffect(() => {
+    applyCustomStyles();
   }, []);
-  
+
   return (
-    <QueryClientProvider client={queryClient}>
+    <Routes>
+      {/* Public routes */}
+      <Route path="/" element={<Index />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/unauthorized" element={<Unauthorized />} />
+
+      {/* Protected routes */}
+      <Route element={<RequireAuth allowedRoles={['admin', 'parent', 'student']} />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/videos" element={<Videos />} />
+          <Route path="/books" element={<Books />} />
+          <Route path="/my-grades" element={<StudentGrades />} />
+          <Route path="/my-code" element={<StudentCode />} />
+      </Route>
+
+      {/* Admin only routes */}
+      <Route element={<RequireAuth allowedRoles={['admin']} />}>
+          <Route path="/manage-students" element={<StudentsManagement />} />
+          <Route path="/manage-parents" element={<ParentsManagement />} />
+          <Route path="/manage-grades" element={<GradesManagement />} />
+          <Route path="/attendance-records" element={<AttendanceRecordList />} />
+          <Route path="/attendance-record/:id" element={<AttendanceRecord />} />
+          <Route path="/scan-code" element={<ScanCode />} />
+          <Route path="/grades-by-grade" element={<GradesByGrade />} />
+          <Route path="/attendance-by-grade" element={<AttendanceListByGrade />} />
+      </Route>
+
+      {/* Parent only routes */}
+      <Route element={<RequireAuth allowedRoles={['parent']} />}>
+          <Route path="/child-grades" element={<Grades />} /> { /* مثال، قد تحتاج لتعديل */}
+      </Route>
+      
+      {/* Catch all */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+}
+
+function App() {
+  return (
+    <Router>
       <AuthProvider>
         <DataProvider>
           <TooltipProvider>
-            <Toaster />
-            <Sonner 
-              toastOptions={{
-                style: {
-                  background: '#171E31',
-                  color: 'white',
-                  border: '1px solid #D4AF37',
-                  borderRadius: '12px',
-                  opacity: '1',
-                },
-                duration: 6000 // جعل الإشعارات تظهر لمدة 6 ثوانٍ
-              }} 
-            />
-            <BrowserRouter>
-              <div className="relative min-h-screen font-tajawal">
-                <PhysicsBackground />
-                <div className="relative z-10">
-                  <Routes>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/dashboard" element={<RequireAuth children={<Dashboard />} />} />
-                    
-                    {/* Admin Routes */}
-                    <Route path="/students" element={<RequireAuth allowedRoles={["admin"]} children={<StudentsManagement />} />} />
-                    <Route path="/parents" element={<RequireAuth allowedRoles={["admin"]} children={<ParentsManagement />} />} />
-                    <Route path="/scan-code" element={<RequireAuth allowedRoles={["admin"]} children={<ScanCode />} />} />
-                    <Route path="/attendance-list" element={<RequireAuth allowedRoles={["admin"]} children={<AttendanceRecordList />} />} />
-                    <Route path="/attendance-list/:grade" element={<RequireAuth allowedRoles={["admin"]} children={<AttendanceListByGrade />} />} />
-                    <Route path="/grades-management" element={<RequireAuth allowedRoles={["admin"]} children={<GradesManagement />} />} />
-                    <Route path="/grades-management/:grade" element={<RequireAuth allowedRoles={["admin"]} children={<GradesByGrade />} />} />
-                    
-                    {/* Student Routes */}
-                    <Route path="/student-code" element={<RequireAuth allowedRoles={["student"]} children={<StudentCode />} />} />
-                    <Route path="/student-grades" element={<RequireAuth allowedRoles={["student"]} children={<StudentGrades />} />} />
-                    
-                    {/* All Users Routes */}
-                    <Route path="/videos" element={<RequireAuth allowedRoles={["admin", "student"]} children={<Videos />} />} />
-                    <Route path="/books" element={<RequireAuth allowedRoles={["admin", "student"]} children={<Books />} />} />
-                    
-                    {/* Parent & Student Routes */}
-                    <Route path="/attendance-record" element={<RequireAuth allowedRoles={["parent", "student"]} children={<AttendanceRecord />} />} />
-                    <Route path="/grades" element={<RequireAuth allowedRoles={["parent", "student"]} children={<Grades />} />} />
-                    
-                    {/* Auth error routes */}
-                    <Route path="/unauthorized" element={<Unauthorized />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </div>
-              </div>
-            </BrowserRouter>
+            <AppContent />
+            <Toaster richColors position="top-center" />
           </TooltipProvider>
         </DataProvider>
       </AuthProvider>
-    </QueryClientProvider>
+    </Router>
   );
-};
+}
 
 export default App;
